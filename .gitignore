@@ -22,6 +22,22 @@
 /frontend/*.pem
 /frontend/*.log
 
+# Binaries for programs and plugins
+/backend/*.exe
+/backend/*.exe~
+/backend/*.dll
+/backend/*.so
+/backend/*.dylib
+
+# Test binary, built with `go test -c`
+/backend/*.test
+
+# Output of the go coverage tool, specifically when used with LiteIDE
+/backend/*.out
+
+# Go workspace file
+/backend/go.work
+
 # IntelliJ IDEA User-specific stuff
 .idea/**/workspace.xml
 .idea/**/tasks.xml
