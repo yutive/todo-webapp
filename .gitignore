@@ -22,6 +22,9 @@
 /frontend/*.pem
 /frontend/*.log
 
-# next.js
-/frontend/.next/
-/frontend/out/
+# IntelliJ IDEA User-specific stuff
+.idea/**/workspace.xml
+.idea/**/tasks.xml
+.idea/**/usage.statistics.xml
+.idea/**/dictionaries
+.idea/**/shelf
