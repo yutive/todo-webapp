@@ -1,27 +1,44 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 
 const App = () => {
     const [todos, setTodos] = useState([]);
+    const [newTodo, setNewTodo] = useState('');
+
+    const fetchTodos = () => {
+        fetch('http://localhost:8080/api/v1/todos')
+            .then(response => response.json())
+            .then(data => setTodos(data))
+            .catch(error => console.error('Error:', error));
+    };
 
     useEffect(() => {
-        const fetchTodos = () => {
-            fetch('http://localhost:8080/api/v1/todos')
-                .then(response => response.json())
-                .then(data => setTodos(data))
-                .catch(error => console.error('Error:', error));
-        };
-
         fetchTodos(); // Fetch todos immediately
-
-        const intervalId = setInterval(fetchTodos, 5000); // Fetch todos every 1 second
-
-        // Clean up function
-        return () => clearInterval(intervalId);
     }, []);
 
+    const handleNewTodoChange = (event) => {
+        setNewTodo(event.target.value);
+    };
+
+    const handleNewTodoSubmit = (event) => {
+        event.preventDefault();
+        // Here you would add code to submit the new todo to your API
+        // After submitting the new todo, fetch the updated list of todos
+        fetchTodos();
+    };
+
     return (
-        <div className="min-h-screen bg-gradient-to-r from-blue-500 to-fuchsia-400 flex flex-col items-center justify-center text-white font-poppins">
-            <h1 className="text-5xl font-bold mb-8">Todo List</h1>
+        <div className="min-h-screen bg-gradient-to-r from-blue-500 to-fuchsia-400 flex flex-col items-center justify-center text-white font-poppins px-4 sm:px-0">
+            <h1 className="text-5xl font-bold mb-8 text-center">Todo List</h1>
+            <form onSubmit={handleNewTodoSubmit} className="w-full max-w-md mb-8">
+                <input
+                    type="text"
+                    value={newTodo}
+                    onChange={handleNewTodoChange}
+                    placeholder="New Todo"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:border-transparent"
+                />
+                <button type="submit" className="w-full mt-2 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded-md shadow-sm">Add Todo</button>
+            </form>
             <ul className="w-full max-w-md bg-white rounded-xl shadow-md p-6 text-black">
                 {todos && todos.map(todo => (
                     todo.text && <li key={todo.id} className="text-lg my-2 border-b-2 border-gray-200 py-2">{todo.text}</li>
