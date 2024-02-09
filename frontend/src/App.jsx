@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 
+const API_URL = 'http://localhost:8080/api/v1';
+
 const App = () => {
     const [todos, setTodos] = useState([]);
     const [newTodo, setNewTodo] = useState('');
@@ -8,7 +10,7 @@ const App = () => {
     useEffect(() => {
         const fetchTodos = async () => {
             try {
-                const response = await fetch('http://localhost:8080/api/v1/todos');
+                const response = await fetch(`${API_URL}/todos`);
                 const data = await response.json();
                 setTodos(data);
             } catch (error) {
@@ -31,7 +33,7 @@ const App = () => {
         };
 
         try {
-            const response = await fetch('http://localhost:8080/api/v1/create', {
+            const response = await fetch(`${API_URL}/create`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -41,7 +43,7 @@ const App = () => {
             const data = await response.json();
             console.log('Success:', data);
             setNewTodo('');
-            const refresh = await fetch('http://localhost:8080/api/v1/todos');
+            const refresh = await fetch(`${API_URL}/todos`);
             const newData = await refresh.json();
             setTodos(newData);
         } catch (error) {
@@ -51,13 +53,13 @@ const App = () => {
 
     const handleDelete = async (id) => {
         try {
-            const response = await fetch(`http://localhost:8080/api/v1/delete/${id}`, {
+            const response = await fetch(`${API_URL}/delete/${id}`, {
                 method: 'DELETE',
             });
             if (!response.ok) {
                 throw new Error("HTTP status " + response.status);
             }
-            const refresh = await fetch('http://localhost:8080/api/v1/todos');
+            const refresh = await fetch(`${API_URL}/todos`);
             const newData = await refresh.json();
             setTodos(newData);
         } catch (error) {
