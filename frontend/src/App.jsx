@@ -5,7 +5,6 @@ import { v4 as uuidv4 } from 'uuid';
 const App = () => {
     const [todos, setTodos] = useState([]);
     const [newTodo, setNewTodo] = useState('');
-    let id = 0;
 
     const fetchTodos = () => {
         fetch('http://localhost:8080/api/v1/todos')
