@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/yutive/todo-crud-api/controllers"
 )
@@ -12,6 +13,9 @@ func main() {
 
 	//start gin server
 	r := gin.Default()
+
+	// CORS-Middleware
+	r.Use(cors.Default())
 
 	//Home Handler
 	r.GET("/", controllers.HomeHandler)
