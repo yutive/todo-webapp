@@ -1,8 +1,11 @@
 import { useState, useEffect } from 'react';
+import { v4 as uuidv4 } from 'uuid';
+
 
 const App = () => {
     const [todos, setTodos] = useState([]);
     const [newTodo, setNewTodo] = useState('');
+    let id = 0;
 
     const fetchTodos = () => {
         fetch('http://localhost:8080/api/v1/todos')
@@ -21,10 +24,32 @@ const App = () => {
 
     const handleNewTodoSubmit = (event) => {
         event.preventDefault();
-        // Here you would add code to submit the new todo to your API
-        // After submitting the new todo, fetch the updated list of todos
-        fetchTodos();
+
+        const todoToSend = {
+            id: uuidv4(),
+            text: newTodo,
+        };
+
+        fetch('http://localhost:8080/api/v1/create', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(todoToSend),
+        })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Success:', data);
+                // After submitting the new todo, fetch the updated list of todos
+                fetchTodos();
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+
+        setNewTodo(''); // Clear the input field
     };
+
 
     return (
         <div className="min-h-screen bg-gradient-to-r from-blue-500 to-fuchsia-400 flex flex-col items-center justify-center text-white font-poppins px-4 sm:px-0">
