@@ -1,29 +1,28 @@
 import { useState, useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 
-
-
-
 const App = () => {
     const [todos, setTodos] = useState([]);
     const [newTodo, setNewTodo] = useState('');
 
-    const fetchTodos = () => {
-        fetch('http://localhost:8080/api/v1/todos')
-            .then(response => response.json())
-            .then(data => setTodos(data))
-            .catch(error => console.error('Error:', error));
-    };
-
     useEffect(() => {
-        fetchTodos(); // Fetch todos immediately
+        const fetchTodos = async () => {
+            try {
+                const response = await fetch('http://localhost:8080/api/v1/todos');
+                const data = await response.json();
+                setTodos(data);
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        };
+        fetchTodos();
     }, []);
 
     const handleNewTodoChange = (event) => {
         setNewTodo(event.target.value);
     };
 
-    const handleNewTodoSubmit = (event) => {
+    const handleNewTodoSubmit = async (event) => {
         event.preventDefault();
 
         const todoToSend = {
@@ -31,40 +30,40 @@ const App = () => {
             text: newTodo,
         };
 
-        fetch('http://localhost:8080/api/v1/create', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(todoToSend),
-        })
-            .then(response => response.json())
-            .then(data => {
-                console.log('Success:', data);
-                fetchTodos();
-            })
-            .catch((error) => {
-                console.error('Error:', error);
+        try {
+            const response = await fetch('http://localhost:8080/api/v1/create', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(todoToSend),
             });
-
-        setNewTodo(''); // Clear the input field
+            const data = await response.json();
+            console.log('Success:', data);
+            setNewTodo('');
+            const refresh = await fetch('http://localhost:8080/api/v1/todos');
+            const newData = await refresh.json();
+            setTodos(newData);
+        } catch (error) {
+            console.error('Error:', error);
+        }
     };
 
-    function handleDelete(id) {
-        fetch(`http://localhost:8080/api/v1/delete/${id}`, {
-            method: 'DELETE',
-        })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error("HTTP status " + response.status);
-                }
-                return response.json();
-            })
-            .then(() => {
-                fetchTodos();
-            })
-            .catch(error => console.error('An error occurred:', error));
-    }
+    const handleDelete = async (id) => {
+        try {
+            const response = await fetch(`http://localhost:8080/api/v1/delete/${id}`, {
+                method: 'DELETE',
+            });
+            if (!response.ok) {
+                throw new Error("HTTP status " + response.status);
+            }
+            const refresh = await fetch('http://localhost:8080/api/v1/todos');
+            const newData = await refresh.json();
+            setTodos(newData);
+        } catch (error) {
+            console.error('An error occurred:', error);
+        }
+    };
 
     return (
         <div
