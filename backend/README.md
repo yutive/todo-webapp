@@ -10,19 +10,10 @@ These instructions will get you a copy of the project up and running on your loc
 ### Prerequisites
 
 - Go programming language (version 1.16 or higher)
-- Postman or any API client to test the endpoints
 
 ### Running the application
 
-1. Clone the repository
-```bash
-git clone https://github.com/yutive/todo-crud-api.git
-```
-2. Navigate into the project directory
-```bash
-cd todo-crud-api
-```
-3. Run the application
+Run the application
 ```bash
 go run main.go
 ```
