@@ -14,8 +14,8 @@ These instructions will get you a copy of the project up and running on your loc
 ### Running the application
 
 Run the application
-```bash
-go run main.go
+```bashyar
+go run app.go
 ```
 
 ## API Endpoints
