@@ -44,3 +44,6 @@
 .idea/**/usage.statistics.xml
 .idea/**/dictionaries
 .idea/**/shelf
+
+# Docker / Devcontainer
+/backend/.devcontainer
