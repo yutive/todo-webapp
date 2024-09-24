@@ -2,47 +2,45 @@ import { useState, useEffect, ChangeEvent, FormEvent } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { z } from 'zod';
 
-// Zod schema for validating the structure of a todo
+// Define the structure of Todo with Zod
 const todoSchema = z.object({
-    id: z.string().uuid(),
-    text: z.string().min(1, "Todo cannot be empty"),
+    id: z.string(),
+    text: z.string(),
 });
 
-// Zod schema for validating an array of todos
-const todosSchema = z.array(todoSchema);
-
-// Type definition derived from the schema
+// Type derived from Zod schema
 type Todo = z.infer<typeof todoSchema>;
 
+// Backend URL
 const API_URL = 'http://localhost:8080/api/v1';
 
 const App = () => {
     const [todos, setTodos] = useState<Todo[]>([]);
     const [newTodo, setNewTodo] = useState<string>('');
 
-    // Fetch todos from the API on component mount
+    // Fetch todos on component mount
     useEffect(() => {
         const fetchTodos = async () => {
             try {
                 const response = await fetch(`${API_URL}/todos`);
                 const data = await response.json();
 
-                // Validate data with Zod
-                const validatedTodos = todosSchema.parse(data);
+                // Validate and parse the data with Zod
+                const validatedTodos = z.array(todoSchema).parse(data);
                 setTodos(validatedTodos);
             } catch (error) {
-                console.error('Error:', error);
+                console.error('Error fetching todos:', error);
             }
         };
         fetchTodos();
     }, []);
 
-    // Handle new todo input change
+    // Handle input changes
     const handleNewTodoChange = (event: ChangeEvent<HTMLInputElement>) => {
         setNewTodo(event.target.value);
     };
 
-    // Handle form submission for adding a new todo
+    // Handle new todo submission
     const handleNewTodoSubmit = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
 
@@ -52,9 +50,7 @@ const App = () => {
         };
 
         try {
-            // Validate new todo with Zod before sending
-            todoSchema.parse(todoToSend);
-
+            // Post the new todo to the backend
             const response = await fetch(`${API_URL}/create`, {
                 method: 'POST',
                 headers: {
@@ -63,17 +59,16 @@ const App = () => {
                 body: JSON.stringify(todoToSend),
             });
 
-            const data = await response.json();
-            console.log('Success:', data);
-            setNewTodo('');
+            if (!response.ok) {
+                throw new Error('Failed to create todo');
+            }
 
-            // Fetch updated todos
-            const refresh = await fetch(`${API_URL}/todos`);
-            const newData = await refresh.json();
-            const validatedTodos = todosSchema.parse(newData);
-            setTodos(validatedTodos);
+            // Fetch updated todos after successful creation
+            const updatedTodos = await response.json();
+            setTodos([...todos, updatedTodos]);
+            setNewTodo('');
         } catch (error) {
-            console.error('Error:', error);
+            console.error('Error adding new todo:', error);
         }
     };
 
@@ -83,17 +78,15 @@ const App = () => {
             const response = await fetch(`${API_URL}/delete/${id}`, {
                 method: 'DELETE',
             });
+
             if (!response.ok) {
-                throw new Error("HTTP status " + response.status);
+                throw new Error('Failed to delete todo');
             }
 
-            // Fetch updated todos
-            const refresh = await fetch(`${API_URL}/todos`);
-            const newData = await refresh.json();
-            const validatedTodos = todosSchema.parse(newData);
-            setTodos(validatedTodos);
+            // Filter out the deleted todo locally
+            setTodos(todos.filter((todo) => todo.id !== id));
         } catch (error) {
-            console.error('An error occurred:', error);
+            console.error('Error deleting todo:', error);
         }
     };
 
@@ -114,17 +107,15 @@ const App = () => {
             </form>
             <ul className="w-full max-w-md bg-white rounded-xl shadow-md p-6 text-black">
                 {todos.map((todo) => (
-                    todo.text && (
-                        <li key={todo.id} className="flex justify-between items-center my-2 border-b-2 border-gray-200 py-2">
-                            <p>{todo.text}</p>
-                            <button
-                                className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded"
-                                onClick={() => handleDelete(todo.id)}
-                            >
-                                X
-                            </button>
-                        </li>
-                    )
+                    <li key={todo.id} className="flex justify-between items-center my-2 border-b-2 border-gray-200 py-2">
+                        <p>{todo.text}</p>
+                        <button
+                            className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded"
+                            onClick={() => handleDelete(todo.id)}
+                        >
+                            X
+                        </button>
+                    </li>
                 ))}
             </ul>
         </div>
