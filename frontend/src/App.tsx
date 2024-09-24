@@ -111,19 +111,24 @@ const App = () => {
                     Add Todo
                 </button>
             </form>
-            <ul className="w-full max-w-md bg-white rounded-xl shadow-md p-6 text-black">
-                {todos.map((todo) => (
-                    <li key={todo.id} className="flex justify-between items-center my-2 border-b-2 border-gray-200 py-2">
-                        <p>{todo.text}</p>
-                        <button
-                            className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded"
-                            onClick={() => handleDelete(todo.id)}
-                        >
-                            X
-                        </button>
-                    </li>
-                ))}
-            </ul>
+            {todos.length > 0 && (
+                <ul className="w-full max-w-md bg-white rounded-xl shadow-md p-6 text-black">
+                    {todos.map((todo) => (
+                        <li key={todo.id} className="flex justify-between items-center my-2 border-b-2 border-gray-200 py-2">
+                            <p>{todo.text}</p>
+                            <button
+                                className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded"
+                                onClick={() => handleDelete(todo.id)}
+                            >
+                                X
+                            </button>
+                        </li>
+                    ))}
+                </ul>
+            )}
+            {todos.length === 0 && (
+                <p className="text-white mt-4">No todos available. Add your first todo!</p>
+            )}
         </div>
     );
 };
