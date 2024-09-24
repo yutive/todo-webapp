@@ -44,6 +44,12 @@ const App = () => {
     const handleNewTodoSubmit = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
 
+        // Prevent sending empty todos
+        if (newTodo.trim() === '') {
+            alert("Todo cannot be empty!"); // Alert the user
+            return; // Do not proceed with the submission
+        }
+
         const todoToSend: Todo = {
             id: uuidv4(),
             text: newTodo,
