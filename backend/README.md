@@ -21,7 +21,7 @@ go run app.go
 ### Start the mongodb
 ``` bash
 # Start docker container
-docker run --name mongodb -d -p 27017:27017 -e MONGO_INITDB_ROOT_USERNAME=laurin MONGO_INITDB_ROOT_PASSWORD=laurin mongodb/mongodb-community-server:6.0-ubi8
+docker run --name mongodb -d -p 27017:27017 -e MONGO_INITDB_ROOT_USERNAME=laurin -e MONGO_INITDB_ROOT_PASSWORD=laurin mongodb/mongodb-community-server:6.0-ubi8
 # Connect to the db via mongosh in the container to manage the db
 docker exec -it mongodb mongosh --host localhost --port 27017 --username laurin --password laurin --authenticationDatabase admin
 ```
