@@ -7,8 +7,9 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: laurin
       MONGO_INITDB_ROOT_PASSWORD: laurin
+      MONGO_INITDB_DATABASE: todo
     ports:
-      - "27017:27017"
+      - "${MONGO_PORT}:${MONGO_PORT}"
     volumes:
       - mongodb-data:/data/db
 
