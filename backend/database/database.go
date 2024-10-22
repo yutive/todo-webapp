@@ -3,6 +3,8 @@ package database
 import (
 	"context"
 	"fmt"
+	"github.com/yutive/todo-crud-api/models"
+	"go.mongodb.org/mongo-driver/bson"
 	"log"
 	"os"
 	"time"
@@ -12,12 +14,6 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
-
-// Todo represents a todo item with UUID and text
-type Todo struct {
-	ID   string `bson:"_id,omitempty"` // Use omitempty to ignore empty ID fields
-	Text string `bson:"text"`
-}
 
 var (
 	Client         *mongo.Client
@@ -47,7 +43,6 @@ func ConnectDB() error {
 	LoadEnv() // Load environment variables
 
 	uri := CreateMongoURI()
-	log.Printf("MongoDB URI: %s\n", uri) // Log the URI for debugging
 
 	clientOptions := options.Client().ApplyURI(uri)
 
@@ -58,7 +53,7 @@ func ConnectDB() error {
 	}
 
 	// Set the collection
-	TodoCollection = Client.Database(os.Getenv("MONGO_DB")).Collection("todo") // Ensure the collection name is correct
+	TodoCollection = Client.Database(os.Getenv("MONGO_DB")).Collection("todo")
 
 	// Ping the database to check the connection
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -71,9 +66,9 @@ func ConnectDB() error {
 }
 
 // InsertTodo inserts a new todo item into the collection
-func InsertTodo(text string) (*Todo, error) {
-	id := uuid.New().String()        // Generate a new UUID for the todo
-	todo := Todo{ID: id, Text: text} // Create a new todo instance
+func InsertTodo(text string) (*models.Todo, error) {
+	id := uuid.New().String()               // Generate a new UUID for the todo
+	todo := models.Todo{ID: id, Text: text} // Create a new todo instance
 
 	_, err := TodoCollection.InsertOne(context.Background(), todo)
 	if err != nil {
@@ -82,4 +77,76 @@ func InsertTodo(text string) (*Todo, error) {
 
 	log.Printf("Inserted todo: %+v\n", todo)
 	return &todo, nil
+}
+
+// GetTodos retrieves all todo items from the collection
+func GetTodos() ([]*models.Todo, error) {
+	var todos []*models.Todo
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	cursor, err := TodoCollection.Find(ctx, bson.M{})
+	if err != nil {
+		return nil, fmt.Errorf("failed to retrieve todos: %w", err)
+	}
+	defer cursor.Close(ctx)
+
+	for cursor.Next(ctx) {
+		var todo models.Todo
+		if err := cursor.Decode(&todo); err != nil {
+			return nil, fmt.Errorf("failed to decode todo: %w", err)
+		}
+		todos = append(todos, &todo)
+	}
+
+	if err := cursor.Err(); err != nil {
+		return nil, fmt.Errorf("cursor error: %w", err)
+	}
+
+	log.Printf("Retrieved %d todos\n", len(todos))
+	return todos, nil
+}
+
+// GetTodoByID retrieves a todo item by its ID
+func GetTodoByID(id string) (*models.Todo, error) {
+	var todo models.Todo
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	err := TodoCollection.FindOne(ctx, bson.M{"_id": id}).Decode(&todo)
+	if err != nil {
+		return nil, fmt.Errorf("failed to find todo: %w", err)
+	}
+
+	return &todo, nil
+}
+
+// UpdateTodo updates an existing todo item
+func UpdateTodo(id string, updatedTodo models.Todo) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	_, err := TodoCollection.UpdateOne(ctx, bson.M{"_id": id}, bson.M{"$set": updatedTodo})
+	if err != nil {
+		return fmt.Errorf("failed to update todo: %w", err)
+	}
+
+	log.Printf("Updated todo with ID: %s\n", id)
+	return nil
+}
+
+// DeleteTodo deletes a todo item by its ID
+func DeleteTodo(id string) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	_, err := TodoCollection.DeleteOne(ctx, bson.M{"_id": id})
+	if err != nil {
+		return fmt.Errorf("failed to delete todo: %w", err)
+	}
+
+	log.Printf("Deleted todo with ID: %s\n", id)
+	return nil
 }
