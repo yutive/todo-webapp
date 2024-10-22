@@ -2,18 +2,24 @@ import { useState, useEffect } from 'react';
 import { z } from 'zod';
 import { v4 as uuidv4 } from 'uuid';
 
+// Define the schema for a todo using zod for validation
 const todoSchema = z.object({
-    id: z.string(),
-    text: z.string(),
+    ID: z.string(),
+    Text: z.string(),
 });
 
+
+// Infer the Todo type from the schema
 export type Todo = z.infer<typeof todoSchema>;
+
+// Set the API base URL
 const API_URL = 'http://localhost:8080/api/v1';
 
 const useTodos = () => {
-    const [todos, setTodos] = useState<Todo[]>([]);
-    const [newTodo, setNewTodo] = useState<string>('');
+    const [todos, setTodos] = useState<Todo[]>([]);  // Initialize todos state
+    const [newTodo, setNewTodo] = useState<string>('');  // State to track new todo input
 
+    // Fetch todos from the API on component mount
     useEffect(() => {
         const fetchTodos = async () => {
             try {
@@ -28,19 +34,24 @@ const useTodos = () => {
         fetchTodos();
     }, []);
 
+    // Handle submitting a new todo
     const handleNewTodoSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
+        event.preventDefault();  // Prevent the default form submission behavior
+
+        // Ensure that the new todo is not empty
         if (newTodo.trim() === '') {
             alert("Todo cannot be empty!");
             return;
         }
 
+        // Construct a new todo object with a generated UUID
         const todoToSend: Todo = {
-            id: uuidv4(),
-            text: newTodo,
+            ID: uuidv4(),
+            Text: newTodo,
         };
 
         try {
+            // Send a POST request to create a new todo
             const response = await fetch(`${API_URL}/create`, {
                 method: 'POST',
                 headers: {
@@ -53,17 +64,24 @@ const useTodos = () => {
                 throw new Error('Failed to create todo');
             }
 
-            const updatedTodos = await response.json();
-            setTodos([...todos, updatedTodos]);
+            // Parse the response to get the newly created todo
+            const createdTodo = await response.json();
+
+            // Add the newly created todo to the list of todos
+            setTodos([...todos, createdTodo]);
+
+            // Clear the new todo input
             setNewTodo('');
         } catch (error) {
             console.error('Error adding new todo:', error);
         }
     };
 
-    const handleDelete = async (id: string) => {
+    // Handle deleting a todo by its ID
+    const handleDelete = async (ID: string) => {
         try {
-            const response = await fetch(`${API_URL}/delete/${id}`, {
+            // Send a DELETE request to remove the todo
+            const response = await fetch(`${API_URL}/delete/${ID}`, {
                 method: 'DELETE',
             });
 
@@ -71,12 +89,14 @@ const useTodos = () => {
                 throw new Error('Failed to delete todo');
             }
 
-            setTodos(todos.filter(todo => todo.id !== id));
+            // Remove the deleted todo from the state
+            setTodos(todos.filter(todo => todo.ID !== ID));
         } catch (error) {
             console.error('Error deleting todo:', error);
         }
     };
 
+    // Return the todos, the newTodo state, and the handlers for creating and deleting todos
     return { todos, newTodo, setNewTodo, handleNewTodoSubmit, handleDelete };
 };
 
