@@ -2,16 +2,30 @@ package main
 
 import (
 	"fmt"
+	"log"
+	"os"
+
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/yutive/todo-crud-api/controllers"
+	"github.com/yutive/todo-crud-api/database"
 )
 
 func main() {
-	//starter text
-	fmt.Println("todo crud api")
+	fmt.Println("Starting Todo CRUD API with MongoDB")
 
-	//start gin server
+	if err := database.ConnectDB(); err != nil {
+		log.Fatalf("Could not connect to database: %v", err)
+	}
+
+	// Example: Insert a todo item
+	todo, err := database.InsertTodo("Example todo item")
+	if err != nil {
+		log.Fatalf("Error inserting todo: %v", err)
+	}
+
+	log.Printf("Successfully inserted todo: %+v\n", todo)
+
 	r := gin.Default()
 
 	// CORS-Middleware
@@ -41,9 +55,11 @@ func main() {
 		c.JSON(404, gin.H{"message": "Not found"})
 	})
 
-	// listen and serve on localhost:8080
-	err := r.Run()
-	if err != nil {
-		return
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+	if err := r.Run(":" + port); err != nil {
+		log.Fatalf("Error starting server: %v", err)
 	}
 }
