@@ -1,14 +1,18 @@
 version: '3.8'
 
 services:
-  todo-api:
-    build:
-      context: .
-      dockerfile: dockerfile
-    ports:
-      - "8080:8080"
+  mongodb:
+    image: mongodb/mongodb-community-server:6.0-ubi8
+    container_name: mongodb
     environment:
-      - GIN_MODE=release
+      MONGO_INITDB_ROOT_USERNAME: laurin
+      MONGO_INITDB_ROOT_PASSWORD: laurin
+      MONGO_INITDB_DATABASE: todo
+    ports:
+      - "27017:27017"
     volumes:
-      - .:/app
-    restart: unless-stopped
+      - mongodb-data:/data/db
+
+volumes:
+  mongodb-data:
+    driver: local

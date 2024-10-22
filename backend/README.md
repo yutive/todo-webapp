@@ -14,8 +14,16 @@ These instructions will get you a copy of the project up and running on your loc
 ### Running the application
 
 Run the application
-```bash
-go run main.go
+```bashyar
+go run app.go
+```
+
+### Start the mongodb
+``` bash
+# Start docker container
+docker compose up -d
+# Connect to the db via mongosh in the container to manage the db
+docker exec -it mongodb mongosh --host localhost --port 27017 --username laurin --password laurin --authenticationDatabase admin
 ```
 
 ## API Endpoints
