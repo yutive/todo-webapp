@@ -38,6 +38,10 @@
 # Go workspace file
 /backend/go.work
 
+# backend env file
+/backend/.env
+
+
 # IntelliJ IDEA User-specific stuff
 .idea/**/workspace.xml
 .idea/**/tasks.xml
