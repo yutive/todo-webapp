@@ -1,7 +1,7 @@
 # Dockerfile for the frontend project
 
 # Use the official Node.js 18 image as the base image
-FROM node:18
+FROM node:18 AS build
 
 # Set the working directory in the container
 WORKDIR /app

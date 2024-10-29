@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongodb/mongodb-community-server:6.0-ubi8
+    container_name: mongodb
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: laurin
+      MONGO_INITDB_ROOT_PASSWORD: laurin
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb-data:/data/db
+  
+  backend:
+    image: todo_backend
+    container_name: backend
+    environment:
+      MONGO_DB: todo   # oder der Name, den du für die MongoDB-Datenbank gewählt hast
+      MONGO_USER: laurin
+      MONGO_PASSWORD: laurin
+      MONGO_HOST: mongodb       # Container-Name des MongoDB-Containers
+      MONGO_PORT: 27017         # MongoDB-Standardport
+      PORT: 8080
+    ports:
+      - "8080:8080" 
+
+  frontend:
+    image: todo_frontend
+    container_name: frontend
+    environment:
+      NODE_ENV: production
+    ports:
+      - "3000:3000"
+
+volumes:
+  mongodb-data:
+    driver: local
