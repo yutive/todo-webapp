@@ -18,14 +18,6 @@ func main() {
 		log.Fatalf("Could not connect to database: %v", err)
 	}
 
-	// Example: Insert a todo item
-	todo, err := database.InsertTodo("Example todo item")
-	if err != nil {
-		log.Fatalf("Error inserting todo: %v", err)
-	}
-
-	log.Printf("Successfully inserted todo: %+v\n", todo)
-
 	r := gin.Default()
 
 	// CORS-Middleware
@@ -37,6 +29,7 @@ func main() {
 	// Versioning of API
 	v1 := r.Group("/api/v1")
 	{
+		v1.GET("7", controllers.HomeHandler)
 		//Get Todos
 		v1.GET("/todos", controllers.GetTodos)
 		// Get Todo by ID

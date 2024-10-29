@@ -9,10 +9,10 @@ interface TodoItemProps {
 const TodoItem: React.FC<TodoItemProps> = ({ todo, handleDelete }) => {
     return (
         <li className="flex justify-between items-center my-2 border-b-2 border-gray-200 py-2">
-            <p>{todo.text}</p>
+            <p>{todo.Text}</p>
             <button
                 className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded"
-                onClick={() => handleDelete(todo.id)}
+                onClick={() => handleDelete(todo.ID)}
             >
                 X
             </button>
