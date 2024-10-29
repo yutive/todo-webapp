@@ -13,7 +13,6 @@ services:
       - mongodb-data:/data/db
   
   backend:
-    # image: todo_backend
     build:
       context: ./backend
       dockerfile: Dockerfile
@@ -29,7 +28,6 @@ services:
       - "8080:8080" 
 
   frontend:
-    # image: todo_frontend
     build:
       context: ./frontend
       dockerfile: Dockerfile
