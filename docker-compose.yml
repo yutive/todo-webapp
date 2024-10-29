@@ -13,7 +13,10 @@ services:
       - mongodb-data:/data/db
   
   backend:
-    image: todo_backend
+    # image: todo_backend
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
     container_name: backend
     environment:
       MONGO_DB: todo   # oder der Name, den du für die MongoDB-Datenbank gewählt hast
@@ -26,7 +29,10 @@ services:
       - "8080:8080" 
 
   frontend:
-    image: todo_frontend
+    # image: todo_frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
     container_name: frontend
     environment:
       NODE_ENV: production
