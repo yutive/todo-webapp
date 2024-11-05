@@ -1,6 +1,6 @@
 package models
 
 type Todo struct {
-	ID   string `bson:"_id,omitempty"` // Use omitempty to ignore empty ID fields
+	ID   string `bson:"id"`
 	Text string `bson:"text"`
 }
