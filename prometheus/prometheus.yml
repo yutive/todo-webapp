@@ -1,13 +1,22 @@
 global:
-  scrape_interval: 30s # Set the global scrape interval to 30 seconds
-  evaluation_interval: 30s # Evaluate rules every 30 seconds
+  scrape_interval: 30s
+  evaluation_interval: 30s
 
 scrape_configs:
-  - job_name: 'custom_targets'
-    scrape_interval: 30s # Set scrape interval for this job specifically (optional if global already set)
+  - job_name: 'tcp_checks'
+    metrics_path: /probe
+    params:
+      module: [tcp_connect]  # Use the TCP connect module defined in blackbox.yml
     static_configs:
       - targets:
           - 'localhost:27017'
           - 'localhost:8080'
           - 'localhost:3000'
           - 'localhost:9090'
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - target_label: instance
+        replacement: blackbox
+      - target_label: __address__
+        replacement: localhost:9115  # Blackbox Exporter address
