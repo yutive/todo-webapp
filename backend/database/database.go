@@ -115,7 +115,7 @@ func GetTodoByID(id string) (*models.Todo, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	err := TodoCollection.FindOne(ctx, bson.M{"_id": id}).Decode(&todo)
+	err := TodoCollection.FindOne(ctx, bson.M{"id": id}).Decode(&todo)
 	if err != nil {
 		return nil, fmt.Errorf("failed to find todo: %w", err)
 	}
@@ -128,7 +128,7 @@ func UpdateTodo(id string, updatedTodo models.Todo) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	_, err := TodoCollection.UpdateOne(ctx, bson.M{"_id": id}, bson.M{"$set": updatedTodo})
+	_, err := TodoCollection.UpdateOne(ctx, bson.M{"id": id}, bson.M{"$set": updatedTodo})
 	if err != nil {
 		return fmt.Errorf("failed to update todo: %w", err)
 	}
@@ -142,7 +142,7 @@ func DeleteTodo(id string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	_, err := TodoCollection.DeleteOne(ctx, bson.M{"_id": id})
+	_, err := TodoCollection.DeleteOne(ctx, bson.M{"id": id})
 	if err != nil {
 		return fmt.Errorf("failed to delete todo: %w", err)
 	}
