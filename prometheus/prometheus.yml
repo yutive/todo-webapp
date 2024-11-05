@@ -7,7 +7,7 @@ scrape_configs:
     scrape_interval: 30s # Set scrape interval for this job specifically (optional if global already set)
     static_configs:
       - targets:
-          - '27017:27017'
-          - '8080:8080'
-          - '3000:3000'
-          - '9090:9090'
+          - 'localhost:27017'
+          - 'localhost:8080'
+          - 'localhost:3000'
+          - 'localhost:9090'
