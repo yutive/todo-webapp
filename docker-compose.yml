@@ -24,6 +24,7 @@ services:
       MONGO_HOST: mongodb       # Container-Name des MongoDB-Containers
       MONGO_PORT: 27017         # MongoDB-Standardport
       PORT: 8080
+      GIN_MODE: release
     ports:
       - "8080:8080" 
 
